@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA WC 2026 — Prediction Championship</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #EF9F27;
+      --gold-dark: #BA7517;
+      --green: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-mid: #9FE1CB;
+      --green-text: #085041;
+      --amber: #EF9F27;
+      --amber-light: #FAEEDA;
+      --amber-mid: #FAC775;
+      --amber-text: #633806;
+      --blue: #2962B8;
+      --blue-light: #D6E8FA;
+      --blue-mid: #BAD0F5;
+      --blue-text: #1C3A6E;
+      --purple: #9B59B6;
+      --purple-light: #EDE0F5;
+      --purple-mid: #CFA8E8;
+      --purple-text: #5B2B8A;
+      --red-light: #FCEBEB;
+      --red-text: #791F1F;
+      --red-bar: #F09595;
+      --lime-light: #EAF3DE;
+      --lime-text: #27500A;
+      --lime-bar: #97C459;
+      --lime-bar-exact: #639922;
+      --bg: #0d0d1a;
+      --bg-card: #ffffff;
+      --bg-section: #f5f5f7;
+      --border: #e5e5ea;
+      --text-primary: #1c1c1e;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #aeaeb2;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0d1a0d 100%);
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid var(--gold);
+    }
+    .site-header .eyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 3px;
+      color: var(--gold); margin-bottom: 8px; text-transform: uppercase;
+    }
+    .site-header h1 {
+      font-size: clamp(22px, 5vw, 36px); font-weight: 700;
+      color: #ffffff; margin-bottom: 6px;
+    }
+    .site-header .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); }
+    .site-header .ball { font-size: 32px; margin-bottom: 10px; }
+
+    /* ── MAIN CONTENT ── */
+    .container { max-width: 920px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── LEADERBOARD ── */
+    .leaderboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+    .player-card {
+      background: var(--bg-card); border-radius: 14px;
+      padding: 1.1rem; text-align: center;
+      border: 1.5px solid var(--border); transition: transform 0.2s;
+    }
+    .player-card:hover { transform: translateY(-2px); }
+    .player-card.first { border-color: var(--green); border-width: 2px; }
+    .player-badge {
+      font-size: 10px; font-weight: 600; padding: 3px 8px;
+      border-radius: 20px; display: inline-block; margin-bottom: 8px;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .badge-first  { background: var(--green-mid);  color: var(--green-text); }
+    .badge-second { background: var(--amber-mid);  color: var(--amber-text); }
+    .badge-third  { background: var(--blue-mid);   color: var(--blue-text); }
+    .badge-fourth { background: var(--purple-mid); color: var(--purple-text); }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px; margin: 0 auto 8px;
+    }
+    .avatar-ma { background: var(--green-light);  color: var(--green-text); }
+    .avatar-it { background: var(--amber-light);  color: var(--amber-text); }
+    .avatar-jo { background: var(--blue-light);   color: var(--blue-text); }
+    .avatar-ch { background: var(--purple-light); color: var(--purple-text); }
+    .player-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .player-pts  { font-size: 36px; font-weight: 700; line-height: 1.1; }
+    .pts-ma { color: var(--green); }
+    .pts-it { color: var(--amber); }
+    .pts-jo { color: var(--blue); }
+    .pts-ch { color: var(--purple); }
+    .pts-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ── CHART ── */
+    .chart-wrap {
+      background: var(--bg-card); border-radius: 14px;
+      padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid var(--border);
+    }
+    .chart-wrap h2 {
+      font-size: 12px; font-weight: 600; color: var(--text-tertiary);
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;
+    }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 1.5rem;
+      padding: 0.75rem 1rem; background: var(--bg-card);
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    /* ── MATCH CARD ── */
+    .date-header {
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--gold);
+      background: #0D1B2A; padding: 0.5rem 1rem;
+      border-radius: 8px; margin: 1.25rem 0 0.5rem;
+    }
+    .match-card {
+      background: var(--bg-card); border-radius: 14px;
+      padding: 1rem 1.25rem; margin-bottom: 10px; border: 1px solid var(--border);
+    }
+    .match-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 12px;
+    }
+    .match-name  { font-size: 14px; font-weight: 600; }
+    .match-meta  { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .match-result-label { font-size: 10px; color: var(--text-tertiary); text-align: right; margin-bottom: 2px; }
+    .match-result-score { font-size: 20px; font-weight: 700; text-align: right; }
+    .score-known   { color: var(--text-primary); }
+    .score-pending { color: var(--text-tertiary); }
+    .preds {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .pred-cell {
+      border-radius: 8px; padding: 8px 10px; border-left: 3px solid transparent;
+    }
+    .pred-name  { font-size: 12px; font-weight: 600; }
+    .pred-label { font-size: 11px; opacity: 0.85; margin-top: 1px; }
+    .cell-exact   { background: var(--lime-light);  border-color: var(--lime-bar-exact); color: var(--lime-text); }
+    .cell-correct { background: var(--lime-light);  border-color: var(--lime-bar);       color: #3B6D11; }
+    .cell-wrong   { background: var(--red-light);   border-color: var(--red-bar);        color: var(--red-text); }
+    .cell-pending { background: var(--bg-section);  border-color: #D3D1C7;              color: var(--text-secondary); }
+    .not-counted-banner {
+      font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      color: #8a6200; background: #FFF0C0; border: 1px solid #F5CC50;
+      border-radius: 6px; padding: 3px 10px; display: inline-block; margin-bottom: 10px;
+    }
+    .match-card.not-counted { opacity: 0.6; }
+
+    /* ── FOOTER ── */
+    .site-footer { text-align: center; padding: 2rem 1.5rem; font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .leaderboard { grid-template-columns: repeat(2, 1fr); }
+      .preds { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 380px) {
+      .leaderboard { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="ball">⚽</div>
+  <div class="eyebrow">FIFA World Cup 2026</div>
+  <h1>Prediction Championship</h1>
+  <p class="subtitle">Ita &nbsp;·&nbsp; Jonas &nbsp;·&nbsp; Marina &nbsp;·&nbsp; Cheyanne</p>
+</header>
+
+<main class="container">
+
+  <!-- Leaderboard -->
+  <div class="leaderboard" id="leaderboard"></div>
+
+  <!-- Chart -->
+  <div class="chart-wrap">
+    <h2>Points progression</h2>
+    <div style="position:relative;height:200px;">
+      <canvas id="ptChart" role="img" aria-label="Cumulative points line chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#639922"></span>Exact score — 6 pts</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#97C459"></span>Correct outcome — 3 pts</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#F09595"></span>Wrong outcome — 0 pts</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#D3D1C7"></span>Pending</div>
+  </div>
+
+  <!-- Match cards -->
+  <div class="section-label">Match results</div>
+  <div id="matches"></div>
+
+</main>
+
+<footer class="site-footer">
+  <p>WSW FIFA WC 2026 Predictions &nbsp;·&nbsp; Updated <span id="updated"></span></p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  MATCH DATA — UPDATE RESULTS HERE
+//  realScore:   '2-0' format, or null if not played
+//  realOutcome: 'H' (home win), 'A' (away win), 'D' (draw), or null
+// ═══════════════════════════════════════════════════════════════
+const MATCHES = [
+  // ── MATCHDAY 1 ──────────────────────────────────────────────────────────────
+  // GROUP A
+  { name:'Mexico vs South Africa',       group:'Group A', date:'Jun 11', time:'3:00 PM',  realScore:'2-0',  realOutcome:'H', counted:false, ita:'2-0', jonas:'2-0', marina:'2-0', cheyanne:'2-0' },
+  { name:'South Korea vs Czechia',       group:'Group A', date:'Jun 11', time:'10:00 PM', realScore:'2-1',  realOutcome:'H', counted:false, ita:'2-1', jonas:'2-1', marina:'2-1', cheyanne:'2-1' },
+  // GROUP B
+  { name:'Canada vs Bosnia-Herzegovina', group:'Group B', date:'Jun 12', time:'3:00 PM',  realScore:'1-1',  realOutcome:'D', ita:'2-1', jonas:'2-0', marina:'1-1', cheyanne:'2-0' },
+  { name:'Qatar vs Switzerland',         group:'Group B', date:'Jun 13', time:'3:00 PM',  realScore:'1-1',  realOutcome:'D', ita:'0-2', jonas:'0-2', marina:'1-3', cheyanne:'0-1' },
+  // GROUP C
+  { name:'Brazil vs Morocco',            group:'Group C', date:'Jun 13', time:'6:00 PM',  realScore:'1-1',  realOutcome:'D', ita:'2-1', jonas:'3-1', marina:'3-1', cheyanne:'2-0' },
+  { name:'Haiti vs Scotland',            group:'Group C', date:'Jun 13', time:'9:00 PM',  realScore:'0-1',  realOutcome:'A', ita:'2-2', jonas:'0-2', marina:'0-0', cheyanne:'0-1' },
+  // GROUP D
+  { name:'USA vs Paraguay',              group:'Group D', date:'Jun 12', time:'9:00 PM',  realScore:'4-1',  realOutcome:'H', ita:'2-1', jonas:'2-1', marina:'3-0', cheyanne:'1-1' },
+  { name:'Australia vs Türkiye',         group:'Group D', date:'Jun 14', time:'12:00 AM', realScore:'2-0',  realOutcome:'H', ita:'2-1', jonas:'1-2', marina:'1-1', cheyanne:'1-0' },
+  // GROUP E
+  { name:'Germany vs Curacao',           group:'Group E', date:'Jun 14', time:'1:00 PM',  realScore:'7-1',  realOutcome:'H', ita:'2-1', jonas:'4-0', marina:'4-0', cheyanne:'1-0' },
+  { name:"Côte d'Ivoire vs Ecuador",     group:'Group E', date:'Jun 14', time:'7:00 PM',  realScore:'1-0',  realOutcome:'H', ita:'2-3', jonas:'0-1', marina:'2-0', cheyanne:'1-0' },
+  // GROUP F
+  { name:'Netherlands vs Japan',         group:'Group F', date:'Jun 14', time:'4:00 PM',  realScore:'2-2',  realOutcome:'D', ita:'1-2', jonas:'2-1', marina:'2-2', cheyanne:'2-1' },
+  { name:'Sweden vs Tunisia',            group:'Group F', date:'Jun 14', time:'10:00 PM', realScore:'5-1',  realOutcome:'H', ita:'2-0', jonas:'2-0', marina:'1-0', cheyanne:'2-0' },
+  // GROUP G
+  { name:'Belgium vs Egypt',             group:'Group G', date:'Jun 15', time:'3:00 PM',  realScore:'1-1',  realOutcome:'D', ita:'3-2', jonas:'2-0', marina:'1-2', cheyanne:'2-1' },
+  { name:'IR Iran vs New Zealand',       group:'Group G', date:'Jun 15', time:'9:00 PM',  realScore:'2-2',  realOutcome:'D', ita:'0-1', jonas:'3-0', marina:'2-1', cheyanne:'0-2' },
+  // GROUP H
+  { name:'Spain vs Cabo Verde',          group:'Group H', date:'Jun 15', time:'12:00 PM', realScore:'0-0',  realOutcome:'D', ita:'5-0', jonas:'2-0', marina:'3-0', cheyanne:'1-0' },
+  { name:'Saudi Arabia vs Uruguay',      group:'Group H', date:'Jun 15', time:'6:00 PM',  realScore:'1-1',  realOutcome:'D', ita:'0-2', jonas:'1-2', marina:'2-1', cheyanne:'1-2' },
+  // GROUP I
+  { name:'France vs Senegal',            group:'Group I', date:'Jun 16', time:'3:00 PM',  realScore:'3-1',  realOutcome:'H', ita:'3-0', jonas:'2-1', marina:'2-0', cheyanne:'3-0' },
+  { name:'Iraq vs Norway',               group:'Group I', date:'Jun 16', time:'6:00 PM',  realScore:'1-4',  realOutcome:'A', ita:'1-2', jonas:'1-2', marina:'1-1', cheyanne:'0-2' },
+  // GROUP J
+  { name:'Argentina vs Algeria',         group:'Group J', date:'Jun 16', time:'9:00 PM',  realScore:'3-0',  realOutcome:'H', ita:'3-1', jonas:'2-0', marina:'2-0', cheyanne:'2-1' },
+  { name:'Austria vs Jordan',            group:'Group J', date:'Jun 17', time:'12:00 AM', realScore:'3-1',  realOutcome:'H', ita:'0-0', jonas:'2-0', marina:'2-0', cheyanne:'1-0' },
+  // GROUP K
+  { name:'Portugal vs Congo DR',         group:'Group K', date:'Jun 17', time:'1:00 PM',  realScore:null,   realOutcome:null, ita:'3-0', jonas:'3-0', marina:'4-0', cheyanne:'3-0' },
+  { name:'Uzbekistan vs Colombia',       group:'Group K', date:'Jun 17', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'0-2', jonas:'0-3', marina:'0-2', cheyanne:'0-3' },
+  // GROUP L
+  { name:'England vs Croatia',           group:'Group L', date:'Jun 17', time:'4:00 PM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-1', marina:'2-2', cheyanne:'3-0' },
+  { name:'Ghana vs Panama',              group:'Group L', date:'Jun 17', time:'7:00 PM',  realScore:null,   realOutcome:null, ita:'1-0', jonas:'0-0', marina:'1-0', cheyanne:'1-1' },
+
+  // ── MATCHDAY 2 ──────────────────────────────────────────────────────────────
+  // GROUP A
+  { name:'Czechia vs South Africa',      group:'Group A', date:'Jun 18', time:'12:00 PM', realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-0', marina:'2-1', cheyanne:'1-1' },
+  { name:'Mexico vs South Korea',        group:'Group A', date:'Jun 18', time:'9:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'1-1', marina:'1-1', cheyanne:'2-1' },
+  // GROUP B
+  { name:'Switzerland vs Bosnia-Herz.',  group:'Group B', date:'Jun 18', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'1-0', cheyanne:'2-0' },
+  { name:'Canada vs Qatar',              group:'Group B', date:'Jun 18', time:'6:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'3-1', cheyanne:'1-1' },
+  // GROUP C
+  { name:'Scotland vs Morocco',          group:'Group C', date:'Jun 19', time:'6:00 PM',  realScore:null,   realOutcome:null, ita:'1-3', jonas:'1-1', marina:'2-4', cheyanne:'1-0' },
+  { name:'Brazil vs Haiti',              group:'Group C', date:'Jun 19', time:'8:30 PM',  realScore:null,   realOutcome:null, ita:'4-0', jonas:'4-0', marina:'3-1', cheyanne:'3-0' },
+  // GROUP D
+  { name:'Türkiye vs Paraguay',          group:'Group D', date:'Jun 19', time:'12:00 AM', realScore:null,   realOutcome:null, ita:'2-3', jonas:'0-0', marina:'3-0', cheyanne:'0-1' },
+  { name:'USA vs Australia',             group:'Group D', date:'Jun 19', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-1', marina:'0-1', cheyanne:'1-0' },
+  // GROUP E
+  { name:"Germany vs Côte d'Ivoire",     group:'Group E', date:'Jun 20', time:'4:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'2-0', cheyanne:'1-1' },
+  { name:'Ecuador vs Curacao',           group:'Group E', date:'Jun 20', time:'8:00 PM',  realScore:null,   realOutcome:null, ita:'1-0', jonas:'3-0', marina:'1-1', cheyanne:'0-1' },
+  // GROUP F
+  { name:'Netherlands vs Sweden',        group:'Group F', date:'Jun 20', time:'1:00 PM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-1', marina:'2-1', cheyanne:'1-2' },
+  { name:'Tunisia vs Japan',             group:'Group F', date:'Jun 21', time:'12:00 AM', realScore:null,   realOutcome:null, ita:'1-3', jonas:'1-1', marina:'0-2', cheyanne:'1-2' },
+  // GROUP G
+  { name:'Belgium vs IR Iran',           group:'Group G', date:'Jun 21', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-1', marina:'3-2', cheyanne:'2-1' },
+  { name:'New Zealand vs Egypt',         group:'Group G', date:'Jun 21', time:'9:00 PM',  realScore:null,   realOutcome:null, ita:'1-1', jonas:'1-2', marina:'2-3', cheyanne:'1-1' },
+  // GROUP H
+  { name:'Spain vs Saudi Arabia',        group:'Group H', date:'Jun 21', time:'12:00 PM', realScore:null,   realOutcome:null, ita:'3-1', jonas:'2-0', marina:'2-0', cheyanne:'2-0' },
+  { name:'Uruguay vs Cabo Verde',        group:'Group H', date:'Jun 21', time:'6:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'2-1', cheyanne:'1-1' },
+  // GROUP I
+  { name:'France vs Iraq',               group:'Group I', date:'Jun 22', time:'5:00 PM',  realScore:null,   realOutcome:null, ita:'5-1', jonas:'3-0', marina:'2-0', cheyanne:'2-0' },
+  { name:'Norway vs Senegal',            group:'Group I', date:'Jun 22', time:'8:00 PM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-1', marina:'2-2', cheyanne:'2-0' },
+  // GROUP J
+  { name:'Argentina vs Austria',         group:'Group J', date:'Jun 22', time:'1:00 PM',  realScore:null,   realOutcome:null, ita:'3-1', jonas:'2-1', marina:'3-1', cheyanne:'2-1' },
+  { name:'Jordan vs Algeria',            group:'Group J', date:'Jun 22', time:'11:00 PM', realScore:null,   realOutcome:null, ita:'1-1', jonas:'0-1', marina:'1-1', cheyanne:'1-1' },
+  // GROUP K
+  { name:'Portugal vs Uzbekistan',       group:'Group K', date:'Jun 23', time:'1:00 PM',  realScore:null,   realOutcome:null, ita:'4-1', jonas:'2-0', marina:'5-2', cheyanne:'2-0' },
+  { name:'Colombia vs Congo DR',         group:'Group K', date:'Jun 23', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'2-0', cheyanne:'2-0' },
+  // GROUP L
+  { name:'England vs Ghana',             group:'Group L', date:'Jun 23', time:'4:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'3-0', cheyanne:'3-0' },
+  { name:'Panama vs Croatia',            group:'Group L', date:'Jun 23', time:'7:00 PM',  realScore:null,   realOutcome:null, ita:'1-2', jonas:'0-2', marina:'2-3', cheyanne:'0-2' },
+
+  // ── MATCHDAY 3 ──────────────────────────────────────────────────────────────
+  // GROUP B (simultaneous)
+  { name:'Switzerland vs Canada',        group:'Group B', date:'Jun 24', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'3-2', jonas:'2-1', marina:'3-3', cheyanne:'1-2' },
+  { name:'Bosnia-Herz. vs Qatar',        group:'Group B', date:'Jun 24', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'1-1', jonas:'1-1', marina:'2-0', cheyanne:'0-0' },
+  // GROUP C (simultaneous)
+  { name:'Scotland vs Brazil',           group:'Group C', date:'Jun 24', time:'6:00 PM',  realScore:null,   realOutcome:null, ita:'1-4', jonas:'0-2', marina:'0-4', cheyanne:'1-2' },
+  { name:'Morocco vs Haiti',             group:'Group C', date:'Jun 24', time:'6:00 PM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'3-0', marina:'1-0', cheyanne:'2-0' },
+  // GROUP A (simultaneous)
+  { name:'Czechia vs Mexico',            group:'Group A', date:'Jun 24', time:'9:00 PM',  realScore:null,   realOutcome:null, ita:'2-3', jonas:'1-2', marina:'2-3', cheyanne:'0-2' },
+  { name:'South Africa vs South Korea',  group:'Group A', date:'Jun 24', time:'9:00 PM',  realScore:null,   realOutcome:null, ita:'2-4', jonas:'0-1', marina:'2-0', cheyanne:'0-1' },
+  // GROUP E (simultaneous)
+  { name:"Curacao vs Côte d'Ivoire",     group:'Group E', date:'Jun 25', time:'4:00 PM',  realScore:null,   realOutcome:null, ita:'0-1', jonas:'0-3', marina:'2-2', cheyanne:'1-1' },
+  { name:'Ecuador vs Germany',           group:'Group E', date:'Jun 25', time:'4:00 PM',  realScore:null,   realOutcome:null, ita:'1-4', jonas:'1-2', marina:'1-3', cheyanne:'0-1' },
+  // GROUP F (simultaneous)
+  { name:'Japan vs Sweden',              group:'Group F', date:'Jun 25', time:'7:00 PM',  realScore:null,   realOutcome:null, ita:'3-1', jonas:'1-2', marina:'1-1', cheyanne:'1-1' },
+  { name:'Tunisia vs Netherlands',       group:'Group F', date:'Jun 25', time:'7:00 PM',  realScore:null,   realOutcome:null, ita:'1-1', jonas:'1-2', marina:'1-2', cheyanne:'1-2' },
+  // GROUP D (simultaneous)
+  { name:'Türkiye vs USA',               group:'Group D', date:'Jun 25', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'1-2', jonas:'2-1', marina:'1-2', cheyanne:'0-1' },
+  { name:'Paraguay vs Australia',        group:'Group D', date:'Jun 25', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'1-3', jonas:'1-1', marina:'0-2', cheyanne:'0-1' },
+  // GROUP I (simultaneous)
+  { name:'Norway vs France',             group:'Group I', date:'Jun 26', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'2-4', jonas:'1-3', marina:'1-3', cheyanne:'1-3' },
+  { name:'Senegal vs Iraq',              group:'Group I', date:'Jun 26', time:'3:00 PM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'2-1', marina:'0-2', cheyanne:'1-1' },
+  // GROUP H (simultaneous)
+  { name:'Cabo Verde vs Saudi Arabia',   group:'Group H', date:'Jun 26', time:'8:00 PM',  realScore:null,   realOutcome:null, ita:'1-0', jonas:'1-2', marina:'2-2', cheyanne:'1-0' },
+  { name:'Uruguay vs Spain',             group:'Group H', date:'Jun 26', time:'8:00 PM',  realScore:null,   realOutcome:null, ita:'2-4', jonas:'1-1', marina:'2-2', cheyanne:'1-2' },
+  // GROUP G (simultaneous)
+  { name:'Egypt vs IR Iran',             group:'Group G', date:'Jun 26', time:'11:00 PM', realScore:null,   realOutcome:null, ita:'2-0', jonas:'1-2', marina:'2-2', cheyanne:'0-0' },
+  { name:'New Zealand vs Belgium',       group:'Group G', date:'Jun 26', time:'11:00 PM', realScore:null,   realOutcome:null, ita:'0-4', jonas:'0-3', marina:'1-2', cheyanne:'1-2' },
+  // GROUP L (simultaneous)
+  { name:'Panama vs England',            group:'Group L', date:'Jun 27', time:'5:00 PM',  realScore:null,   realOutcome:null, ita:'1-3', jonas:'0-3', marina:'2-4', cheyanne:'0-2' },
+  { name:'Croatia vs Ghana',             group:'Group L', date:'Jun 27', time:'5:00 PM',  realScore:null,   realOutcome:null, ita:'3-1', jonas:'2-1', marina:'1-0', cheyanne:'1-0' },
+  // GROUP K (simultaneous)
+  { name:'Colombia vs Portugal',         group:'Group K', date:'Jun 27', time:'7:30 PM',  realScore:null,   realOutcome:null, ita:'2-3', jonas:'2-2', marina:'2-3', cheyanne:'3-2' },
+  { name:'Congo DR vs Uzbekistan',       group:'Group K', date:'Jun 27', time:'7:30 PM',  realScore:null,   realOutcome:null, ita:'1-1', jonas:'0-0', marina:'1-1', cheyanne:'1-1' },
+  // GROUP J (simultaneous)
+  { name:'Algeria vs Austria',           group:'Group J', date:'Jun 27', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-2', marina:'2-2', cheyanne:'1-2' },
+  { name:'Jordan vs Argentina',          group:'Group J', date:'Jun 27', time:'10:00 PM', realScore:null,   realOutcome:null, ita:'0-2', jonas:'0-3', marina:'1-3', cheyanne:'0-3' },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  CONTESTANTS
+// ═══════════════════════════════════════════════════════════════
+const CONTESTANTS = [
+  { key: 'ita',      name: 'Ita',      init: 'IT', avatarClass: 'avatar-it', ptsClass: 'pts-it' },
+  { key: 'jonas',    name: 'Jonas',    init: 'JO', avatarClass: 'avatar-jo', ptsClass: 'pts-jo' },
+  { key: 'marina',   name: 'Marina',   init: 'MA', avatarClass: 'avatar-ma', ptsClass: 'pts-ma' },
+  { key: 'cheyanne', name: 'Cheyanne', init: 'CH', avatarClass: 'avatar-ch', ptsClass: 'pts-ch' },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getOutcome(pred) {
+  const [h, a] = pred.split('-').map(Number);
+  return h > a ? 'H' : h < a ? 'A' : 'D';
+}
+
+function scoreResult(pred, realScore, realOutcome) {
+  if (!realOutcome) return { status: 'pending', pts: 0, label: 'Pending' };
+  const po = getOutcome(pred);
+  if (po !== realOutcome) return { status: 'wrong',   pts: 0, label: 'Wrong — 0 pts' };
+  if (realScore && pred === realScore) return { status: 'exact', pts: 6, label: 'Exact score — 6 pts' };
+  return { status: 'correct', pts: 3, label: 'Correct outcome — 3 pts' };
+}
+
+const CELL_CLASSES = { exact:'cell-exact', correct:'cell-correct', wrong:'cell-wrong', pending:'cell-pending' };
+
+// Compute cumulative points
+const cumulative = {};
+CONTESTANTS.forEach(c => cumulative[c.key] = [0]);
+MATCHES.forEach(m => {
+  CONTESTANTS.forEach(c => {
+    const r = (m.counted === false) ? { pts: 0 } : scoreResult(m[c.key], m.realScore, m.realOutcome);
+    const prev = cumulative[c.key];
+    prev.push(prev[prev.length - 1] + r.pts);
+  });
+});
+const totals = {};
+CONTESTANTS.forEach(c => { const arr = cumulative[c.key]; totals[c.key] = arr[arr.length - 1]; });
+
+// Sort for leaderboard
+const sorted = [...CONTESTANTS].sort((a, b) => totals[b.key] - totals[a.key]);
+
+// ── LEADERBOARD ──
+const badgeByRank = ['badge-first','badge-second','badge-third','badge-fourth'];
+const rankText    = ['1st place','2nd place','3rd place','4th place'];
+const leaderEl = document.getElementById('leaderboard');
+
+sorted.forEach((c, i) => {
+  let rank = i;
+  // Handle ties
+  if (i > 0 && totals[c.key] === totals[sorted[i-1].key]) {
+    rank = parseInt(leaderEl.children[i-1].dataset.rank);
+  }
+  const tiedPrev = i > 0 && totals[c.key] === totals[sorted[i-1].key];
+  const tiedNext = i < sorted.length-1 && totals[c.key] === totals[sorted[i+1].key];
+  const tieLabel = (tiedPrev || tiedNext) ? ' — tied' : '';
+  const badge = badgeByRank[rank] || 'badge-fourth';
+  const rText = rankText[rank] || `${rank+1}th place`;
+  const isFirst = rank === 0;
+
+  const card = document.createElement('div');
+  card.className = `player-card${isFirst ? ' first' : ''}`;
+  card.dataset.rank = rank;
+  card.innerHTML = `
+    <span class="player-badge ${badge}">${rText}${tieLabel}</span>
+    <div class="avatar ${c.avatarClass}">${c.init}</div>
+    <div class="player-name">${c.name}</div>
+    <div class="player-pts ${c.ptsClass}">${totals[c.key]}</div>
+    <div class="pts-label">pts confirmed</div>
+  `;
+  leaderEl.appendChild(card);
+});
+
+// ── CHART ──
+const chartLabels = ['Start', ...MATCHES.map(m => m.name.split(' vs ')[0])];
+new Chart(document.getElementById('ptChart'), {
+  type: 'line',
+  data: {
+    labels: chartLabels,
+    datasets: [
+      { label:'Marina',   data:cumulative.marina,   borderColor:'#1D9E75', backgroundColor:'rgba(29,158,117,0.08)',  tension:0.35, fill:true, borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#1D9E75' },
+      { label:'Ita',      data:cumulative.ita,       borderColor:'#EF9F27', backgroundColor:'rgba(239,159,39,0.06)',  tension:0.35, fill:true, borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#EF9F27', borderDash:[6,3] },
+      { label:'Jonas',    data:cumulative.jonas,     borderColor:'#2962B8', backgroundColor:'rgba(41,98,184,0.06)',   tension:0.35, fill:true, borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#2962B8', borderDash:[3,3] },
+      { label:'Cheyanne', data:cumulative.cheyanne,  borderColor:'#9B59B6', backgroundColor:'rgba(155,89,182,0.06)', tension:0.35, fill:true, borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#9B59B6', borderDash:[8,4] },
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:true, position:'top', labels:{ boxWidth:10, font:{ size:11 } } } },
+    scales:{
+      x:{ grid:{ display:false }, ticks:{ font:{ size:9 }, maxRotation:40, maxTicksLimit:20 } },
+      y:{ min:0, grid:{ color:'rgba(0,0,0,0.06)' }, ticks:{ stepSize:3, font:{ size:11 } } }
+    }
+  }
+});
+
+// ── MATCH CARDS ──
+const matchesEl = document.getElementById('matches');
+const dateMap = {
+  'Jun 11':'Thursday, 11 June','Jun 12':'Friday, 12 June','Jun 13':'Saturday, 13 June',
+  'Jun 14':'Sunday, 14 June','Jun 15':'Monday, 15 June','Jun 16':'Tuesday, 16 June',
+  'Jun 17':'Wednesday, 17 June','Jun 18':'Thursday, 18 June','Jun 19':'Friday, 19 June',
+  'Jun 20':'Saturday, 20 June','Jun 21':'Sunday, 21 June','Jun 22':'Monday, 22 June',
+  'Jun 23':'Tuesday, 23 June','Jun 24':'Wednesday, 24 June','Jun 25':'Thursday, 25 June',
+  'Jun 26':'Friday, 26 June','Jun 27':'Saturday, 27 June'
+};
+let lastDate = null;
+MATCHES.forEach(m => {
+  if (m.date !== lastDate) {
+    lastDate = m.date;
+    const hdr = document.createElement('div');
+    hdr.className = 'date-header';
+    hdr.textContent = dateMap[m.date] || m.date;
+    matchesEl.appendChild(hdr);
+  }
+
+  const notCounted = m.counted === false;
+  const card = document.createElement('div');
+  card.className = `match-card${notCounted ? ' not-counted' : ''}`;
+
+  const scoreDisplay = m.realScore ? m.realScore.replace('-',' — ') : 'Pending';
+
+  const predsHtml = CONTESTANTS.map(c => {
+    const r = notCounted
+      ? { status:'pending', label: m.realScore ? m.realScore : 'Not scored' }
+      : scoreResult(m[c.key], m.realScore, m.realOutcome);
+    const cls = notCounted ? 'cell-pending' : CELL_CLASSES[r.status];
+    const labelText = notCounted ? `${m[c.key]} · not scored` : `${m[c.key]} · ${r.label}`;
+    return `<div class="pred-cell ${cls}">
+      <div class="pred-name">${c.name}</div>
+      <div class="pred-label">${labelText}</div>
+    </div>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="match-header">
+      <div>
+        ${notCounted ? '<span class="not-counted-banner">Not counted</span><br>' : ''}
+        <div class="match-name">${m.name}</div>
+        <div class="match-meta">${m.group} · ${m.time} ET</div>
+      </div>
+      <div>
+        <div class="match-result-label">Result</div>
+        <div class="match-result-score ${m.realOutcome ? 'score-known' : 'score-pending'}">${scoreDisplay}</div>
+      </div>
+    </div>
+    <div class="preds">${predsHtml}</div>
+  `;
+  matchesEl.appendChild(card);
+});
+
+// ── FOOTER DATE ──
+document.getElementById('updated').textContent =
+  new Date().toLocaleDateString('en-AU', { day:'numeric', month:'long', year:'numeric' });
+</script>
+</body>
+</html>
