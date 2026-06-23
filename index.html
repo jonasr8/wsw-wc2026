@@ -303,13 +303,13 @@ const MATCHES = [
   { name:'Spain vs Saudi Arabia',        group:'Group H', date:'Jun 22', time:'2:00 AM', realScore:'4-0',  realOutcome:'H',  ita:'3-1', jonas:'2-0', marina:'2-0', cheyanne:'2-0' },
   { name:'Uruguay vs Cabo Verde',        group:'Group H', date:'Jun 22', time:'8:00 AM',  realScore:'2-2',  realOutcome:'D',  ita:'2-0', jonas:'2-0', marina:'2-1', cheyanne:'1-1' },
   // GROUP I
-  { name:'France vs Iraq',               group:'Group I', date:'Jun 23', time:'7:00 AM',  realScore:null,   realOutcome:null, ita:'5-1', jonas:'3-0', marina:'2-0', cheyanne:'2-0' },
-  { name:'Norway vs Senegal',            group:'Group I', date:'Jun 23', time:'10:00 AM',  realScore:null,   realOutcome:null, ita:'2-2', jonas:'1-1', marina:'2-2', cheyanne:'2-0' },
+  { name:'France vs Iraq',               group:'Group I', date:'Jun 23', time:'7:00 AM',  realScore:'3-0',  realOutcome:'H',  ita:'5-1', jonas:'3-0', marina:'2-0', cheyanne:'2-0' },
+  { name:'Norway vs Senegal',            group:'Group I', date:'Jun 23', time:'10:00 AM',  realScore:'3-2',  realOutcome:'H',  ita:'2-2', jonas:'1-1', marina:'2-2', cheyanne:'2-0' },
   // GROUP J
-  { name:'Argentina vs Austria',         group:'Group J', date:'Jun 23', time:'3:00 AM',  realScore:null,   realOutcome:null, ita:'3-1', jonas:'2-1', marina:'3-1', cheyanne:'2-1' },
-  { name:'Jordan vs Algeria',            group:'Group J', date:'Jun 23', time:'1:00 PM', realScore:null,   realOutcome:null, ita:'1-1', jonas:'0-1', marina:'1-1', cheyanne:'1-1' },
+  { name:'Argentina vs Austria',         group:'Group J', date:'Jun 23', time:'3:00 AM',  realScore:'2-0',  realOutcome:'H',  ita:'3-1', jonas:'2-1', marina:'3-1', cheyanne:'2-1' },
+  { name:'Jordan vs Algeria',            group:'Group J', date:'Jun 23', time:'1:00 PM', realScore:'1-2',  realOutcome:'A',  ita:'1-1', jonas:'0-1', marina:'1-1', cheyanne:'1-1' },
   // GROUP K
-  { name:'Portugal vs Uzbekistan',       group:'Group K', date:'Jun 24', time:'3:00 AM',  realScore:null,   realOutcome:null, ita:'4-1', jonas:'2-0', marina:'5-2', cheyanne:'2-0' },
+  { name:'Portugal vs Uzbekistan',       group:'Group K', date:'Jun 24', time:'3:00 AM',  realScore:'5-0',  realOutcome:'H',  ita:'4-1', jonas:'2-0', marina:'5-2', cheyanne:'2-0' },
   { name:'Colombia vs Congo DR',         group:'Group K', date:'Jun 24', time:'12:00 PM', realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'2-0', cheyanne:'2-0' },
   // GROUP L
   { name:'England vs Ghana',             group:'Group L', date:'Jun 24', time:'6:00 AM',  realScore:null,   realOutcome:null, ita:'2-0', jonas:'2-0', marina:'3-0', cheyanne:'3-0' },
@@ -508,8 +508,7 @@ MATCHES.forEach(m => {
 });
 
 // ── FOOTER DATE ──
-document.getElementById('updated').textContent =
-  new Date().toLocaleDateString('en-AU', { day:'numeric', month:'long', year:'numeric' });
+document.getElementById('updated').textContent = '24 June 2026, 7:38 AM AEST';
 </script>
 </body>
 </html>
